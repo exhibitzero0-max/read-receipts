@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Read Receipts — first person test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    height: 100dvh;
+    background: #07060c;
+    color: #f3efe8;
+    font: 500 15px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  body { display: flex; align-items: center; justify-content: center; }
+  #stage {
+    position: relative;
+    width: min(100vw, 100dvh * 720 / 1280);
+    height: min(100dvh, 100vw * 1280 / 720);
+    max-width: 480px;
+    background: #05040a;
+    overflow: hidden;
+    touch-action: none;
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+  }
+  #view { position: absolute; inset: 0; overflow: hidden; touch-action: none; }
+  video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    background: #05040a;
+  }
+  #ui { position: absolute; inset: 0; z-index: 4; touch-action: none; }
+  #hint {
+    position: absolute; left: 50%;
+    bottom: max(28px, calc(16px + env(safe-area-inset-bottom)));
+    transform: translateX(-50%);
+    max-width: 86%;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(10, 8, 16, .62);
+    color: #f4f0ea;
+    font: 650 14px/1.25 -apple-system, system-ui, sans-serif;
+    letter-spacing: .01em;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: opacity .35s;
+    z-index: 8;
+    text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  }
+  #hint.show { opacity: 1; }
+  #wake, #done {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px;
+    background: rgba(6,5,12,.55);
+    z-index: 12; text-align: center; padding: 32px;
+    touch-action: none;
+  }
+  #wake h1, #done h1 { font: 700 22px/1.2 -apple-system, system-ui, sans-serif; letter-spacing: .02em; }
+  #wake p, #done p { opacity: .85; max-width: 260px; }
+  #wake button, #done button {
+    appearance: none; border: 0; border-radius: 999px;
+    min-width: 200px; min-height: 56px;
+    padding: 14px 32px;
+    background: #f2eee7; color: #1a1420;
+    font: 700 17px/1 system-ui;
+    cursor: pointer;
+    touch-action: none;
+  }
+  #done { display: none; }
+  .grab {
+    position: absolute; z-index: 7;
+    touch-action: none;
+    display: none;
+    /* huge thumb target */
+    width: 120px; height: 160px;
+    margin-left: -60px; margin-top: -80px;
+  }
+  .grab.show { display: block; }
+  .grab img {
+    position: absolute; inset: 10%;
+    width: 80%; height: 80%;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 12px rgba(0,0,0,.45));
+    transition: transform .15s ease;
+  }
+  .grab:active img, .grab.held img { transform: scale(1.06); }
+  #switchGrab { left: 74%; top: 52%; width: 130px; height: 180px; margin-left: -65px; margin-top: -90px; }
+  #boltGrab { left: 28%; top: 52%; width: 150px; height: 150px; margin-left: -75px; margin-top: -75px; }
+  #boltGrab img { inset: 8%; width: 84%; height: 84%; }
+  .halo {
+    position: absolute; inset: 8%;
+    border-radius: 24px;
+    box-shadow: 0 0 0 3px rgba(255,230,170,.35), 0 0 22px rgba(255,200,120,.28);
+    pointer-events: none;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: .55; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+  }
+  #segmark { position: absolute; left: 8px; top: max(8px, env(safe-area-inset-top));
+    font: 600 10px/1 ui-monospace, monospace; opacity: .35; z-index: 20; pointer-events: none; }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div id="view">
+      <video id="vGetup" playsinline webkit-playsinline preload="auto" src="fp_getup.mp4" poster="fp_wake_poster.jpg"></video>
+      <video id="vWalk" playsinline webkit-playsinline preload="auto" src="fp_walk.mp4" style="display:none"></video>
+    </div>
+    <div id="ui">
+      <div id="switchGrab" class="grab" aria-label="Light switch">
+        <div class="halo"></div>
+        <img id="paddle" alt="switch" src="fp_paddle_off.png">
+      </div>
+      <div id="boltGrab" class="grab" aria-label="Deadbolt">
+        <div class="halo"></div>
+        <img id="bolt" alt="deadbolt" src="fp_bolt.png">
+      </div>
+      <div id="hint"></div>
+      <div id="wake">
+        <h1>Wake up</h1>
+        <p>You’re in bed. It’s dark. Tap to sit up.</p>
+        <button id="wakeBtn" type="button">Tap to wake</button>
+      </div>
+      <div id="done">
+        <h1>You’re at the door.</h1>
+        <p>First-person test ends here.</p>
+        <button id="againBtn" type="button">Play again</button>
+      </div>
+    </div>
+    <div id="segmark" data-seg="boot">boot</div>
+  </div>
+<script>
+(function () {
+  const stage = document.getElementById('stage');
+  const vGetup = document.getElementById('vGetup');
+  const vWalk = document.getElementById('vWalk');
+  const hint = document.getElementById('hint');
+  const wake = document.getElementById('wake');
+  const done = document.getElementById('done');
+  const switchGrab = document.getElementById('switchGrab');
+  const boltGrab = document.getElementById('boltGrab');
+  const paddle = document.getElementById('paddle');
+  const bolt = document.getElementById('bolt');
+  const markEl = document.getElementById('segmark');
+
+  // Kill scroll / pinch / rubber-band at the source on iOS.
+  function block(e) { e.preventDefault(); }
+  ['touchstart','touchmove','touchend','gesturestart','gesturechange'].forEach(ev => {
+    document.addEventListener(ev, block, { passive: false });
+    document.documentElement.addEventListener(ev, block, { passive: false });
+    document.body.addEventListener(ev, block, { passive: false });
+    stage.addEventListener(ev, block, { passive: false });
+  });
+  document.addEventListener('wheel', block, { passive: false });
+
+  function setSeg(name) {
+    markEl.textContent = name;
+    markEl.setAttribute('data-seg', name);
+    document.body.setAttribute('data-seg', name);
+  }
+  function showHint(t) {
+    hint.textContent = t || '';
+    hint.classList.toggle('show', !!t);
+  }
+
+  const state = { seg: 'wake', switchOn: false, boltOpen: false };
+
+  function show(el, on) { el.classList.toggle('show', !!on); }
+
+  function playVid(v, onEnd) {
+    v.style.display = 'block';
+    v.currentTime = 0;
+    v.muted = false;
+    const p = v.play();
+    if (p && p.catch) p.catch(() => { v.muted = true; v.play().catch(() => {}); });
+    const doneOnce = () => { v.removeEventListener('ended', doneOnce); onEnd && onEnd(); };
+    v.addEventListener('ended', doneOnce);
+  }
+
+  function startGetup() {
+    if (state.seg !== 'wake') return;
+    wake.style.display = 'none';
+    setSeg('getup');
+    showHint('');
+    playVid(vGetup, () => {
+      vGetup.pause();
+      vGetup.currentTime = vGetup.duration || vGetup.currentTime;
+      setSeg('switch');
+      show(switchGrab, true);
+      showHint('Flip the light switch');
+    });
+  }
+
+  function startWalk() {
+    show(switchGrab, false);
+    showHint('');
+    vGetup.style.display = 'none';
+    setSeg('walk');
+    playVid(vWalk, () => {
+      vWalk.pause();
+      vWalk.currentTime = vWalk.duration || vWalk.currentTime;
+      setSeg('bolt');
+      show(boltGrab, true);
+      showHint('Slide the deadbolt');
+    });
+  }
+
+  function finish() {
+    show(boltGrab, false);
+    showHint('');
+    setSeg('done');
+    done.style.display = 'flex';
+  }
+
+  // --- switch: drag up / tap to flip ---
+  let drag = null;
+  function bindGrab(el, { onFlip, axis }) {
+    function pt(e) {
+      const t = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]);
+      if (t) return { x: t.clientX, y: t.clientY };
+      return { x: e.clientX, y: e.clientY };
+    }
+    function down(e) {
+      e.preventDefault(); e.stopPropagation();
+      const p = pt(e);
+      drag = { el, x: p.x, y: p.y, flipped: false };
+      el.classList.add('held');
+    }
+    function move(e) {
+      if (!drag || drag.el !== el) return;
+      e.preventDefault(); e.stopPropagation();
+      const p = pt(e);
+      const dx = p.x - drag.x, dy = p.y - drag.y;
+      if (axis === 'y' && -dy > 28 && !drag.flipped) { drag.flipped = true; onFlip(); }
+      if (axis === 'x' && Math.abs(dx) > 36 && !drag.flipped) { drag.flipped = true; onFlip(dx); }
+    }
+    function up(e) {
+      if (!drag || drag.el !== el) return;
+      e.preventDefault(); e.stopPropagation();
+      el.classList.remove('held');
+      // a firm tap also counts
+      if (!drag.flipped) onFlip(0);
+      drag = null;
+    }
+    el.addEventListener('touchstart', down, { passive: false });
+    el.addEventListener('touchmove', move, { passive: false });
+    el.addEventListener('touchend', up, { passive: false });
+    el.addEventListener('touchcancel', up, { passive: false });
+    el.addEventListener('pointerdown', down);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+  }
+
+  bindGrab(switchGrab, {
+    axis: 'y',
+    onFlip: function () {
+      if (state.switchOn) return;
+      state.switchOn = true;
+      paddle.src = 'fp_paddle_on.png';
+      setTimeout(startWalk, 220);
+    }
+  });
+  bindGrab(boltGrab, {
+    axis: 'x',
+    onFlip: function (dx) {
+      if (state.boltOpen) return;
+      state.boltOpen = true;
+      bolt.style.transform = 'translateX(' + (dx && dx > 0 ? 18 : -18) + 'px)';
+      setTimeout(finish, 280);
+    }
+  });
+
+  document.getElementById('wakeBtn').addEventListener('click', function (e) {
+    e.preventDefault(); startGetup();
+  });
+  document.getElementById('wakeBtn').addEventListener('touchend', function (e) {
+    e.preventDefault(); e.stopPropagation(); startGetup();
+  }, { passive: false });
+  document.getElementById('againBtn').addEventListener('click', function (e) {
+    e.preventDefault(); location.reload();
+  });
+  document.getElementById('againBtn').addEventListener('touchend', function (e) {
+    e.preventDefault(); e.stopPropagation(); location.reload();
+  }, { passive: false });
+
+  // Wake is also a tap anywhere on the wake overlay.
+  wake.addEventListener('touchend', function (e) {
+    if (state.seg !== 'wake') return;
+    e.preventDefault(); startGetup();
+  }, { passive: false });
+
+  setSeg('wake');
+  showHint('');
+})();
+</script>
+</body>
+</html>
