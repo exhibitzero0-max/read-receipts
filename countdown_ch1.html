@@ -97,13 +97,21 @@ img{display:block}
 .comp.choosing .ibar{display:none}
 .attb{width:34px;height:34px;border-radius:17px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--tx2);flex:none}
 .field{flex:1;min-height:38px;border-radius:19px;border:1px solid var(--line);background:var(--s1);padding:8px 14px;font-size:16px;color:var(--tx3)}
+.choices{display:none;padding:10px 16px calc(14px + var(--sb));background:transparent;border:0}
+.comp.choosing .choices{display:flex;flex-direction:column;align-items:stretch;gap:10px;animation:chIn .25s ease}
 @keyframes chIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 .ch-hd{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 10px;font-size:13px;font-weight:600;color:var(--tx3)}
 .ch-hd b{color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.6px;font-size:12px}
+/* #145: chat choices use Nova's original call pill (#call .clc, Nova test_ch1 99452c12c9–87bae88d29) */
+.opt{-webkit-appearance:none;appearance:none;display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;box-sizing:border-box;margin:0;padding:12px 18px;text-align:center;white-space:normal;background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:22px;font-size:16px;font-family:inherit;line-height:1.3;cursor:pointer;-webkit-backdrop-filter:blur(20px) saturate(1.2);backdrop-filter:blur(20px) saturate(1.2);text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.opt:first-of-type{margin-top:0}
+.opt:active,.opt.hit{background:rgba(255,255,255,.34)}
+.opt.act{background:transparent;border:1.5px dashed rgba(255,255,255,.45);font-style:italic}
 /* THIS CHOICE WILL MATTER */
-#clch .mcap{font-size:12px;font-weight:800;letter-spacing:1.4px;color:#B9AEFF;text-align:center;margin:0 0 4px}
-#clch .mtit{font-size:15px;font-weight:600;text-align:center;color:var(--tx);margin-bottom:10px}
-#clch .mfacts{font-size:13.5px;color:var(--tx2);text-align:center;margin:-4px 0 10px;line-height:1.4}
+.matter{display:flex;flex-direction:column;align-items:stretch;gap:10px;border:0;border-radius:22px;padding:12px;background:rgba(20,18,36,.6)} /* #145: no box outline around the pill group */
+.matter .mcap{font-size:12px;font-weight:800;letter-spacing:1.4px;color:#B9AEFF;text-align:center;margin:0 0 4px}
+.matter .mtit{font-size:15px;font-weight:600;text-align:center;color:var(--tx);margin-bottom:10px}
+.matter .mfacts{font-size:13.5px;color:var(--tx2);text-align:center;margin:-4px 0 10px;line-height:1.4}
 /* panel (practical / confirmation) */
 #panel{position:absolute;inset:0;z-index:95;display:none;align-items:flex-end;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #panel.on{display:flex}
@@ -136,6 +144,11 @@ img{display:block}
 .cl-mid .cn{font-size:30px;font-weight:600;letter-spacing:-.4px}.cl-mid .cs{font-size:16px;opacity:.65;margin-top:4px;font-variant-numeric:tabular-nums}
 .cl-tag{position:relative;z-index:2;margin-top:10px;font-size:12px;font-weight:700;letter-spacing:.6px;background:rgba(0,0,0,.45);padding:4px 9px;border-radius:7px;display:none}
 .cl-tag.on{display:block}
+.cl-ch{position:absolute;z-index:3;bottom:calc(150px + var(--sb));left:0;right:0;margin:0 auto;width:min(calc(100% - 32px),380px);display:none;flex-direction:column;align-items:stretch;gap:10px}
+.cl-ch.on{display:flex;animation:chIn .25s ease}
+.clc{-webkit-appearance:none;appearance:none;display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin:0;padding:12px 18px;text-align:center;white-space:normal;background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:22px;font-size:16px;-webkit-backdrop-filter:blur(20px) saturate(1.2);backdrop-filter:blur(20px) saturate(1.2);text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.clc:active,.clc.hit{background:rgba(255,255,255,.34)}
+.cl-ch.matter{border-radius:22px;padding:12px;background:rgba(20,18,36,.6)}
 .cl-bar{position:absolute;z-index:3;left:0;right:0;bottom:calc(34px + var(--sb));display:flex;justify-content:center;gap:18px;align-items:center}
 .cl-bar .cb{width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .cl-bar .cb.end{background:#FF3B30}
@@ -231,7 +244,7 @@ img{display:block}
 #intro button,#endc button{margin-top:28px;height:50px;padding:0 30px;border-radius:25px;background:#fff;color:#0a0a0e;font-weight:700;font-size:16px}
 .pick{width:100%;max-width:320px;margin-top:14px}
 
-#clch .clbar{height:3px;border-radius:2px;background:#9D8CFF;opacity:.7;margin:6px 10px 0;transform-origin:left center;animation:clbar linear forwards}@keyframes clbar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.cl-ch .clbar{height:3px;border-radius:2px;background:#9D8CFF;opacity:.7;margin:6px 10px 0;transform-origin:left center;animation:clbar linear forwards}@keyframes clbar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 .tile img{will-change:transform;transform-origin:50% 45%}
 .tile.lagging::after{content:'';position:absolute;inset:0;z-index:2;background:rgba(10,10,16,.18)}
 .tile.lagging .tn::after{content:' · poor connection';opacity:.8}
@@ -453,6 +466,7 @@ body.onlock #sbt{visibility:hidden}
 .sendghost{position:absolute;z-index:31;pointer-events:none;box-sizing:border-box;transform-origin:0 0;will-change:transform,opacity;overflow:hidden;word-wrap:break-word}
 .foldghost{position:absolute;display:block!important;z-index:30;pointer-events:none;box-sizing:border-box;margin:0;will-change:transform,opacity}
 
+.choices.grow{animation:chGrow .26s cubic-bezier(.25,.8,.25,1)}
 @keyframes chGrow{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
 /* Window Table booking (COMPLAINTS 112) */
 .wt-art{height:130px;overflow:hidden}.wt-in{padding:16px 20px 28px}.wt-n{font-size:24px;font-weight:800}.wt-s{color:var(--tx3);font-size:14px}
@@ -566,7 +580,7 @@ html.lpm #sb .sbi svg:last-child rect:nth-child(2){fill:#ffd60a}
 .snapv .scap2{position:absolute;left:0;right:0;top:62%;text-align:center;background:rgba(0,0,0,.55);color:#fff;padding:8px;font-size:16px}.sring{position:absolute;top:calc(58px + var(--sa));right:16px}
 /* 144.15: the top edge always takes the notification-centre swipe, even over a scrolling chat */
 #sb{touch-action:none}#sb::before{content:'';position:absolute;left:0;right:0;top:0;height:calc(30px + var(--sa));pointer-events:auto;touch-action:none}
-/* ===== v11: Nova r11 choice sheet + subtitle pill, copied verbatim from /workspace/rr_r11 (live test_ch1 css) ===== */
+/* ===== v11: subtitle pill from Nova r11 (choice sheet removed in #145) ===== */
 #vosub{position:absolute;left:16px;right:16px;bottom:calc(118px + var(--sb,0px));z-index:120;text-align:center;pointer-events:none;opacity:0;transition:opacity .12s}
 #vosub.on{opacity:1;transition:none}
 #vosub span{display:inline-block;background:rgba(0,0,0,.72);color:#fff;font-size:15px;line-height:1.4;padding:8px 12px;border-radius:12px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
@@ -581,56 +595,8 @@ html.lpm #sb .sbi svg:last-child rect:nth-child(2){fill:#ffd60a}
   z-index:120;
   text-align:center;
   pointer-events:none!important;}
-#clch.float-ch{position:absolute;
-  left:16px; right:16px;
-  bottom:calc(52px + var(--sb,0px));
-  z-index:140;
-  margin:0;
-  width:auto; max-width:none;
-  display:none;
-  flex-direction:column; align-items:stretch; gap:8px;
-  pointer-events:none;
-  padding:10px 10px 12px;
-  box-sizing:border-box;
-  border-radius:22px;
-  background:rgba(8,8,14,0.94);
-  -webkit-backdrop-filter:blur(20px);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 8px 28px rgba(0,0,0,0.45);
-  outline:none !important;}
-#clch.float-ch.on{display:flex;
-  animation:chIn .25s ease;}
-#phone:has(#home.on) #clch.float-ch{bottom:calc(110px + var(--sb,0px));}
-#phone:has(#call.on) #clch.float-ch, #phone:has(#call.on) #clch.float-ch.on{bottom:calc(118px + var(--sb,0px));}
-#phone:has(#home.on) #vosub{bottom:calc(108px + var(--sb,0px)) !important;}
-#clch.float-ch .clc, #clch .clc{pointer-events:auto;
-  -webkit-appearance:none; appearance:none;
-  display:flex; align-items:center; justify-content:center;
-  width:100%; min-height:48px; flex:none;
-  margin:0; padding:12px 18px;
-  background:rgba(16,16,24,0.92);
-  color:#fff;
-  border:1px solid rgba(255,255,255,0.14);
-  border-radius:18px;
-  font-size:16px; font-family:inherit; line-height:1.3;
-  text-align:center; white-space:normal;
-  -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
-  cursor:pointer;
-  outline:none !important;
-  box-shadow:none !important;}
-#clch.float-ch .clc:active, #clch.float-ch .clc.hit, #clch .clc:active, #clch .clc.hit{background:rgba(32,32,44,0.94);}
-#clch.hl, #clch.hl .clc, #clch .clc.hl, #clch.float-ch.hl, #clch.float-ch .clc.hl{outline:none !important; box-shadow:none !important;}
-/* Countdown-only glue (layout, not look): the call screen's own controls sit lower, the pill rides above an open sheet,
-   a chat keeps its last message visible above the sheet, "this choice will matter" header inside the same sheet */
+/* Countdown-only glue (layout): the call screen's own controls sit lower */
 #phone:has(#call.on) #vosub{bottom:calc(118px + var(--sb,0px))!important}
-body.sheet-on #vosub{bottom:calc(var(--sheet-h,0px) + 60px + var(--sb,0px))!important}
-body.sheet-on #phone:has(#call.on) #vosub{bottom:calc(var(--sheet-h,0px) + 126px + var(--sb,0px))!important}
-body.sheet-on #phone:has(#home.on) #vosub{bottom:calc(var(--sheet-h,0px) + 118px + var(--sb,0px))!important}
-body.sheet-on #chat .msgs{padding-bottom:calc(var(--sheet-h,0px) + 12px)!important}
-#clch .mcap{margin-top:2px}
-#clch .clbar{margin:2px 12px 0}
-#gch{display:none!important}
 .cl-x{bottom:auto;top:calc(112px + var(--sa))}
 #cbg img,#cbg canvas.rigc{object-fit:contain!important;object-position:50% 42%!important;background:#0d0d12}
 /* ---- 144.16: Nova r11 #start page, verbatim (applied to Countdown's #intro.nstart) */
@@ -656,6 +622,12 @@ body.sheet-on #chat .msgs{padding-bottom:calc(var(--sheet-h,0px) + 12px)!importa
 .sendb.ready{background:var(--acc)}
 #sendb.hit,.sendb.hit{animation:sPulse .22s ease}
 @keyframes sPulse{0%{transform:scale(1)}50%{transform:scale(.85)}100%{transform:scale(1)}}
+
+/* #145: Countdown choices back on Nova's ORIGINAL choice UI (Nova test_ch1 99452c12c9 → 87bae88d29, before the Round 9 sheet).
+   Layout glue as in Countdown s13; the s13 dark pill override (#clch .clc rgba(18,18,26,.86)) is dropped so the pills are Nova's own. */
+#clch{position:absolute;z-index:66;bottom:calc(190px + var(--sb))}#gch{position:absolute;left:0;right:0;bottom:0;z-index:67;display:none;padding:12px 12px calc(30px + var(--sb));background:var(--s1);border-top:1px solid var(--line);border-radius:22px 22px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.45)}#gch.on{display:block;animation:chIn .25s ease}#clch.offcall{box-shadow:0 0 0 100vmax rgba(0,0,0,.6);border-radius:22px}#clch.offcall.matter{background:rgba(20,18,36,.94)}#clch.offcall .clc{background:rgba(40,40,52,.96)}
+/* #145 s19: in a call the pill stack sits just above the controls bar (as Nova), small gaps */
+#phone:has(#call.on) #clch{bottom:calc(92px + var(--sb));gap:8px}
 </style></head><body>
 <div id="phone">
  <div id="sb"><span id="sbt">21:02</span><span class="sbi"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="15" height="8" rx="2"/><rect x="23.5" y="4" width="2" height="4" rx="1" opacity=".5"/></svg></span></div>
@@ -914,8 +886,13 @@ function compUI() {
   const was = c.classList.contains('choosing'); c.classList.toggle('choosing', !!inT); const box = $('#choices'); $('#choices').innerHTML = '';
   const show_ = inT; choiceAway(pc, inT);
   $('#attb').dataset.wait = (S.waitAttach === S.open) ? '1' : ''; $('#attb').classList.toggle('pulse-btn', S.waitAttach === S.open && !!S.open);
-  sheetUI();
-  if (inT) toBottom();
+  if (!show_) return;
+  const wrap = pc.matter ? H('div', 'matter') : box;
+  if (pc.matter) { wrap.appendChild(H('div', 'mcap', 'THIS CHOICE WILL MATTER')); wrap.appendChild(H('div', 'mtit', esc(pc.matter))); if (pc.facts) wrap.appendChild(H('div', 'mfacts', esc(pc.facts))); box.appendChild(wrap); }
+  else box.appendChild(H('div', 'ch-hd', `<b>${pc.single ? 'Send' : 'Reply'}</b><span>${esc(pc.to || (S.threads[pc.tid] ? S.threads[pc.tid].name : ''))}</span>`));
+  if (fl && pc.matter) wrap.insertBefore(H('div', 'ch-hd', `<b>Reply</b><span>${esc(S.threads[pc.tid].name)}</span>`), wrap.firstChild);
+  pc.opts.forEach((o, i) => { const b = H('button', 'opt', esc(o)); b.dataset.k = i; b.onclick = () => { if (pc.done) return; pc.done = true; b.classList.add('hit'); SFX.tap(); if (!(window.SET && SET.skipType)) sendGhostFrom(b);   /* Settings › Game › Skip typing animation (Nova): replies send instantly */ const r = pc.resolve; S.pendingText = null; compUI(); r(i); }; wrap.appendChild(b); });
+  if (inT && !was) { box.classList.remove('grow'); void box.offsetWidth; box.classList.add('grow'); } if (inT) toBottom();
 }
 /** TEXT CHOICE: exactly one message is sent */
 async function choiceBeat() { const gap = 1500 + Math.random() * 700; const left = (S.lastIn || 0) + gap - performance.now(); if (left > 0) await wait(left); }
@@ -937,26 +914,18 @@ async function tapSend(tid, text, o = {}) {
   S.log.push('autosend:' + tid); await msg(tid, 'nora', text); return 0;
 }
 /** SPOKEN CHOICE: shown on the call screen (or the first-person scene while the call is audible) */
-function clchUI() { pillUI(); sheetUI(); }
-/* v11 (COMPLAINTS 144.3): ONE choice sheet everywhere = Nova r11 #clch.float-ch (calls, chats, scenes, thoughts).
-   A spoken choice wins over a text reply; the sheet never covers the subtitle pill (the pill sits just above it). */
-function sheetUI() {
-  const box = $('#clch'); const blocked = $('#viewer').classList.contains('on') || $('#panel').classList.contains('on') || $('#intro').classList.contains('on');
-  const sp = S.pendingSpoken; const tx = S.pendingText; const txIn = tx && tx.tid === S.open && S.where === 'chat';
-  const pc = !blocked && sp ? sp : !blocked && txIn ? tx : null; const kind = pc === sp ? 'sp' : 'tx';
-  box.className = 'float-ch' + (pc ? ' on' : '') + (pc && pc.matter ? ' matter' : ''); box.innerHTML = ''; box.dataset.kind = pc ? kind : '';
-  document.body.classList.toggle('sheet-on', !!pc);
-  if (!pc) { $('#phone').style.removeProperty('--sheet-h'); return; }
+function clchUI() {
+  const box = $('#clch'); const pc = S.pendingSpoken; const vis = pc && !$('#viewer').classList.contains('on') && !$('#panel').classList.contains('on');
+  box.className = 'cl-ch' + (vis ? ' on' : '') + (pc && pc.matter ? ' matter' : '') + (vis && S.where !== 'call' ? ' offcall' : ''); box.innerHTML = ''; pillUI();
+  if (!vis) return;
   if (pc.matter) { box.appendChild(H('div', 'mcap', 'THIS CHOICE WILL MATTER')); box.appendChild(H('div', 'mtit', esc(pc.matter))); if (pc.facts) box.appendChild(H('div', 'mfacts', esc(pc.facts))); }
-  pc.opts.forEach((o, i) => { const b = H('button', 'clc', esc(o)); b.dataset.k = i; if (kind === 'tx') b.classList.add('opt');
-    b.onclick = () => { if (pc.done) return; pc.done = true; b.classList.add('hit'); SFX.tap(); const r = pc.resolve;
-      if (kind === 'sp') { S.pendingSpoken = null; clearTimeout(pc.toT); } else { if (!(window.SET && SET.skipType)) sendGhostFrom(b); S.pendingText = null; }
-      compUI(); sheetUI(); r(i); }; box.appendChild(b); });
+  pc.opts.forEach((o, i) => { const b = H('button', 'clc', esc(o)); b.dataset.k = i; b.onclick = () => { b.classList.add('hit'); SFX.tap(); const r = pc.resolve; S.pendingSpoken = null; clearTimeout(pc.toT); clchUI(); r(i); }; box.appendChild(b); });
   /* COMPLAINTS 122: a small in-call reply times out naturally (the moment passes) while the call keeps going */
-  if (kind === 'sp' && pc.tmo && S.where === 'call') { const bar = H('div', 'clbar'); box.appendChild(bar); const left = Math.max(1500, pc.tmo - (performance.now() - pc.t0)); bar.style.animationDuration = left + 'ms';
-    clearTimeout(pc.toT); pc.toT = setTimeout(() => { if (S.pendingSpoken !== pc || S.where !== 'call') return; TL('choiceTimeout', pc.key); const r = pc.resolve; S.pendingSpoken = null; sheetUI(); r(0); }, left); }
-  requestAnimationFrame(() => { const h = box.getBoundingClientRect().height; $('#phone').style.setProperty('--sheet-h', Math.round(h) + 'px'); if (kind === 'tx') toBottom(); });
+  if (pc.tmo && S.where === 'call') { const bar = H('div', 'clbar'); box.appendChild(bar); const left = Math.max(1500, pc.tmo - (performance.now() - pc.t0)); bar.style.animationDuration = left + 'ms';
+    clearTimeout(pc.toT); pc.toT = setTimeout(() => { if (S.pendingSpoken !== pc || S.where !== 'call') return; TL('choiceTimeout', pc.key); const r = pc.resolve; S.pendingSpoken = null; clchUI(); r(0); }, left); }
 }
+/* #145: s14 'Nova r11 sheet' removed; choices are back on Nova's original UI (composer .choices/.opt for texts, .cl-ch/.clc pills for spoken). */
+function sheetUI() { clchUI(); }
 async function spoken(opts, o = {}) {
   const inCall = S.call && S.call.grid && S.call.state === 'live';
   if (!o.during) { await untilIdle(); if (inCall) await wait(250); else await choiceBeat(); }   // in a call: within ~0.5 s of the cue
