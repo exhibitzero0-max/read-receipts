@@ -641,11 +641,19 @@ html.lpm #sb .sbi svg:last-child rect:nth-child(2){fill:#ffd60a}
 #call .cl-bar .cb.end{background:#FF3B30}
 #call .cl-bar .cb.ans{background:#34C759}
 #call .cl-bar .cb.on{background:#fff;color:#111}
-/* spoken choices: Nova #call .clc + #call.vcall .cl-ch (R3-25); no outline box around the group */
-#phone:has(#call.on) #clch{left:0;right:0;margin:0 auto;width:min(calc(100% - 32px),380px);max-width:none;bottom:calc(30px + max(var(--sb,0px),14px) + 92px);flex-direction:column;align-items:stretch;gap:10px;padding:0;background:none;border:0;box-shadow:none;outline:none!important;border-radius:0}
-#phone:has(#call.on) #clch .clc{-webkit-appearance:none;appearance:none;display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;flex:none;align-self:stretch;box-sizing:border-box;margin:0;padding:12px 18px;text-align:center;white-space:normal;transform:none;background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:22px;font-size:16px;line-height:1.3;font-family:inherit;text-shadow:none;box-shadow:none;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-#phone:has(#call.on) #clch .clc:active,#phone:has(#call.on) #clch .clc.hit{background:rgba(255,255,255,.32)}
-#phone:has(#call.on) #clch.hl,#phone:has(#call.on) #clch .hl{outline:none!important;box-shadow:none!important}
+/* #147 s21: spoken call choices = Nova test_ch1 87bae88d29 rules VERBATIM (lines copied from that build's <style>; only change:
+   "#call.vcall " -> "#call " so Countdown audio calls get the same pills as video calls). #clch is moved inside #call while on a call (as Nova). */
+#call .cl-ch{display:none;flex-direction:column;gap:10px;width:100%;max-width:300px;margin-top:22px}
+#call .cl-ch.on{display:flex;animation:chIn .25s ease}
+#call .clc{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:22px;padding:13px 16px;font-size:16px;font-family:inherit;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+#call .clc:active,#call .clc.hit{background:rgba(255,255,255,.32)}
+#call .cl-ch{position:absolute;z-index:9;left:14px;right:14px;bottom:calc(30px + var(--sb,0px) + 92px);margin:0}
+#call .cl-ch .clc{display:block;width:100%;box-sizing:border-box;margin-left:0;margin-right:0;text-align:center;line-height:1.3}
+#call .cl-ch{left:0;right:0;margin:0 auto;width:min(calc(100% - 32px),380px);max-width:none;align-items:stretch;gap:10px}
+#call .cl-ch .clc{-webkit-appearance:none;appearance:none;display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;flex:none;align-self:stretch;margin:0;padding:12px 18px;text-align:center;white-space:normal;transform:none}
+/* only removal: Nova's tap-hint rectangle (.hl outline) never shows around the call choices */
+#call .cl-ch.hl,#call .cl-ch .hl{outline:none!important;background-color:transparent!important;animation:none!important}
+#call .cl-ch{--sb:max(env(safe-area-inset-bottom,0px),14px)} /* Nova 87bae88d29 :root --sb value, scoped to the call choices */
 </style></head><body>
 <div id="phone">
  <div id="sb"><span id="sbt">21:02</span><span class="sbi"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="15" height="8" rx="2"/><rect x="23.5" y="4" width="2" height="4" rx="1" opacity=".5"/></svg></span></div>
@@ -934,6 +942,7 @@ async function tapSend(tid, text, o = {}) {
 /** SPOKEN CHOICE: shown on the call screen (or the first-person scene while the call is audible) */
 function clchUI() {
   const box = $('#clch'); const pc = S.pendingSpoken; const vis = pc && !$('#viewer').classList.contains('on') && !$('#panel').classList.contains('on');
+  { const host = (vis && S.where === 'call') ? $('#call') : $('#phone'); if (host && box.parentElement !== host) host.appendChild(box); } /* #147: as Nova 87bae88d29, the call choices live inside #call */
   box.className = 'cl-ch' + (vis ? ' on' : '') + (pc && pc.matter ? ' matter' : '') + (vis && S.where !== 'call' ? ' offcall' : ''); box.innerHTML = ''; pillUI();
   if (!vis) return;
   if (pc.matter) { box.appendChild(H('div', 'mcap', 'THIS CHOICE WILL MATTER')); box.appendChild(H('div', 'mtit', esc(pc.matter))); if (pc.facts) box.appendChild(H('div', 'mfacts', esc(pc.facts))); }
